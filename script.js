@@ -8,7 +8,7 @@ let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 const ballRadius = 20;
 
-const blueBallsCount = 2;
+const blueBallsCount = 8;
 
 const blueBalls = [];
 
@@ -71,7 +71,6 @@ function animateFireworks() {
 }
 
 function drawBall() {
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw red ball
@@ -93,11 +92,13 @@ function drawBall() {
 }
 
 function drawTimer() {
-  ctx.clearRect(0, 0, canvas.width, 40); // Clear previous time display
+  ctx.clearRect(0, 0, canvas.width, 50); // Clear previous time display
   ctx.font = '24px Arial';
   ctx.fillStyle = 'black';
   ctx.textAlign = 'center';
   ctx.fillText(`Time: ${elapsedTime.toFixed(2)}s`, canvas.width / 2, 20);
+  ctx.fillText(`Balls: ${blueBalls.length}`, canvas.width / 2, 50);
+
 }
 
 function drawYouWin() {
@@ -111,7 +112,6 @@ function drawYouWin() {
     fireworksCount++;
   }
 
-  
   ctx.font = '48px Arial';
   ctx.fillStyle = 'black';
   ctx.textAlign = 'center';
@@ -189,8 +189,6 @@ setInterval(function() {
         drawTimer();
     }
 }, 10); // Update every 10 milliseconds
-
-
 
 function randomizeBlueBalls() {
     for (const blueBall of blueBalls) {
