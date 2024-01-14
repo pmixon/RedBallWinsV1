@@ -1,11 +1,14 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+const randomizeButton = document.getElementById('randomizeButton');
+randomizeButton.addEventListener('click', randomizeBlueBalls);
+
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 const ballRadius = 20;
 
-const blueBallsCount = 20;
+const blueBallsCount = 2;
 
 const blueBalls = [];
 
@@ -76,10 +79,13 @@ function drawBall() {
     ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2, false);
     ctx.fillStyle = 'red';
     ctx.fill();
-
-    // Draw blue balls
+    //change color back to blue for default values
     ctx.fillStyle = 'blue';
+  
+    // Draw blue balls
+    // ctx.fillStyle = 'blue';
     for (const blueBall of blueBalls) {
+        ctx.fillStyle = blueBall.color;
         ctx.beginPath();
         ctx.arc(blueBall.x, blueBall.y, blueBall.radius, 0, Math.PI * 2, false);
         ctx.fill();
@@ -184,5 +190,15 @@ setInterval(function() {
     }
 }, 10); // Update every 10 milliseconds
 
+
+
+function randomizeBlueBalls() {
+    for (const blueBall of blueBalls) {
+        blueBall.radius = Math.random() * 20 + 5; // Random radius between 5 and 25
+        blueBall.color = 'hsl(' + Math.random() * 360 + ', 100%, 50%)'; // Random hue, full saturation, 50% lightness
+
+    }
+    drawBall(); // Redraw the balls with the new colors and sizes
+}
 // Sources:
 // 1. https://medium.com/samsung-internet-dev/making-an-ar-game-with-aframe-529e03ae90cb
