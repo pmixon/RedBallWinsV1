@@ -5,6 +5,8 @@ let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 const ballRadius = 20;
 
+const blueBallsCount = 20;
+
 const blueBalls = [];
 
 let startTime;
@@ -13,7 +15,60 @@ let elapsedTime = 0;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const fireworks = [];
+
+function createFirework(x, y) {
+  return {
+    x,
+    y,
+    radius: 2,
+    speedX: Math.random() * 8 - 4,
+    speedY: -Math.random() * 15 - 5,
+    color: 'hsl(' + Math.random() * 360 + ', 100%, 50%)',
+    lifespan: Math.random() * 2 + 1,
+  };
+}
+
+let fireworkStartTime = null;
+let fireworksCount = 0;
+
+function animateFireworks() {
+  if (!fireworkStartTime) {
+    fireworkStartTime = performance.now();
+    requestAnimationFrame(animateFireworks);
+  } else {
+    const elapsedTime = (performance.now() - fireworkStartTime) / 1000;
+
+    if (elapsedTime < 10) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBall();
+      drawTimer();
+      drawYouWin();
+
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        const firework = fireworks[i];
+        firework.x += firework.speedX;
+        firework.y += firework.speedY;
+        firework.radius += 0.5;
+        firework.lifespan -= 0.025;
+
+        ctx.beginPath();
+        ctx.arc(firework.x, firework.y, firework.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = firework.color;
+        ctx.fill();
+
+        if (firework.lifespan <= 0) {
+          fireworks.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(animateFireworks);
+    }
+  }
+}
+
 function drawBall() {
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw red ball
@@ -40,6 +95,17 @@ function drawTimer() {
 }
 
 function drawYouWin() {
+
+  if (fireworksCount === 0) {
+    for (let i = 0; i < 20; i++) {
+      fireworks.push(createFirework(Math.random() * canvas.width, canvas.height));
+    }
+
+    animateFireworks();
+    fireworksCount++;
+  }
+
+  
   ctx.font = '48px Arial';
   ctx.fillStyle = 'black';
   ctx.textAlign = 'center';
@@ -47,7 +113,7 @@ function drawYouWin() {
 }
 
 // Generate blue balls at random positions
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < blueBallsCount; i++) {
     blueBalls.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
@@ -66,7 +132,6 @@ drawTimer(); // Draw timer initially
 if (blueBalls.length === 0) {
   drawYouWin();
 }
-
 
 window.addEventListener('keydown', function(event) {
     switch (event.keyCode) {
@@ -119,55 +184,5 @@ setInterval(function() {
     }
 }, 10); // Update every 10 milliseconds
 
-function createFirework(x, y) {
-  const particles = [];
-  for (let i = 0; i < 100; i++) {
-    // Create a particle with random speed, direction, and lifespan
-    const particle = {
-      x,
-      y,
-      speed: Math.random() * 10 + 5, // adjust speed range as needed
-      angle: Math.random() * Math.PI * 2,
-      lifespan: Math.random() * 2 + 1, // adjust lifespan range as needed
-      size: Math.random() * 5 + 2, // adjust size range as needed
-      color: `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
-    };
-    particles.push(particle);
-  }
-  return particles;
-}
-
-function drawWinMessage() {
-  ctx.font = '60px Arial';
-  ctx.fillStyle = 'green';
-  ctx.textAlign = 'center';
-  ctx.fillText('YOU WIN!', canvas.width / 2, canvas.height / 2);
-
-  // Create and store fireworks particles
-  const fireworks = createFirework(canvas.width / 2, canvas.height / 2);
-
-  // Draw and update fireworks in setInterval
-  setInterval(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawWinMessage(); // redraw message for persistence
-
-    // Update and draw particles
-    for (let i = fireworks.length - 1; i >= 0; i--) {
-      const particle = fireworks[i];
-      particle.x += Math.cos(particle.angle) * particle.speed;
-      particle.y += Math.sin(particle.angle) * particle.speed;
-      particle.lifespan -= 10
-
-      if (particle.lifespan <= 0) {
-        fireworks.splice(i, 1); // remove dead particles
-      } else {
-        ctx.fillStyle = particle.color;
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-  }, 10); // update every 10 milliseconds
-}
 // Sources:
 // 1. https://medium.com/samsung-internet-dev/making-an-ar-game-with-aframe-529e03ae90cb
